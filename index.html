@@ -12,21 +12,23 @@
     overflow-x: hidden;
     margin: 0;
     padding: 40px 0;
-    text-align: center;
   }
 
   h1 {
-    font-size: 28px;
-    letter-spacing: 2px;
+    font-size: 26px;
+    letter-spacing: 1px;
     color: silver;
+    text-align: center;
     margin-bottom: 10px;
   }
 
   p.subtitle {
     color: #c0c0c0;
+    text-align: center;
     margin-bottom: 40px;
   }
 
+  /* zvezdice */
   .stars {
     position: fixed;
     width: 2px;
@@ -42,14 +44,20 @@
     50% {opacity: 1; transform: scale(1.5);}
   }
 
+  /* svaki kamion i okvir */
   .truck-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    justify-content: flex-start;
+    margin: 60px auto;
+    width: 90%;
+    max-width: 700px;
     position: relative;
-    margin-bottom: 120px;
   }
 
   .truck {
-    position: relative;
-    width: 200px;
+    width: 120px;
     opacity: 0;
     transform: translateX(100vw);
     transition: all 2s ease;
@@ -61,13 +69,16 @@
   }
 
   .unload-btn {
+    position: absolute;
+    left: 10px;
+    bottom: -35px;
     background: none;
     border: 1px solid silver;
     color: silver;
-    padding: 8px 20px;
-    margin-top: 10px;
+    padding: 6px 16px;
     cursor: pointer;
     font-family: "Courier New", monospace;
+    font-size: 14px;
   }
 
   .unload-btn:hover {
@@ -76,39 +87,37 @@
   }
 
   .message {
-    display: inline-block;
-    background: none;
     border: 1px solid silver;
-    color: silver;
-    padding: 18px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 500px;
-    font-size: 18px;
-    line-height: 1.6;
-    margin-top: 15px;
+    border-radius: 8px;
+    padding: 14px;
+    width: 70%;
+    font-size: 16px;
+    line-height: 1.5;
     opacity: 0;
     transform: translateX(0);
+    color: silver;
   }
 
   .message.show {
-    animation: popOut 1s ease forwards;
+    animation: popOut 0.9s ease forwards;
   }
 
   @keyframes popOut {
     0% {transform: translateX(0) scale(0.5); opacity: 0;}
-    60% {transform: translateX(40px) scale(1.1); opacity: 1;}
-    100% {transform: translateX(50px) scale(1); opacity: 1;}
+    60% {transform: translateX(30px) scale(1.05); opacity: 1;}
+    100% {transform: translateX(40px) scale(1); opacity: 1;}
   }
 
   .next-btn {
     display: none;
-    margin-top: 20px;
     background: none;
     border: 1px solid silver;
     color: silver;
-    padding: 8px 18px;
+    padding: 6px 16px;
+    margin-top: 15px;
     cursor: pointer;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
   }
 
   .next-btn:hover {
@@ -116,11 +125,12 @@
     color: #0b0b12;
   }
 
+  /* završni kamion */
   #final {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(11,11,18,0.95);
+    background: rgba(11,11,18,0.96);
     z-index: 10;
     justify-content: center;
     align-items: center;
@@ -129,7 +139,7 @@
   }
 
   #final img {
-    width: 300px;
+    width: 240px;
     transform: translateX(100vw);
     transition: all 2s ease;
   }
@@ -141,7 +151,7 @@
   #final h2 {
     color: silver;
     margin-top: 20px;
-    font-size: 24px;
+    font-size: 22px;
     line-height: 1.5;
   }
 
@@ -206,19 +216,22 @@ messages.forEach((msg, i) => {
   block.className = "truck-block";
   block.innerHTML = `
     <img src="IMG_8981.png" class="truck" id="truck${i}">
-    <br>
     <button class="unload-btn" id="btn${i}">Istovar</button>
     <div class="message" id="msg${i}">${msg}</div>
-    <br>
-    <button class="next-btn" id="next${i}">${nextLabels[i]}</button>
   `;
   journey.appendChild(block);
+
+  const next = document.createElement("button");
+  next.className = "next-btn";
+  next.id = `next${i}`;
+  next.textContent = nextLabels[i];
+  journey.appendChild(next);
 });
 
 function typeText(element, text, i = 0) {
   if (i < text.length) {
     element.innerHTML += text.charAt(i);
-    setTimeout(() => typeText(element, text, i + 1), 35);
+    setTimeout(() => typeText(element, text, i + 1), 30);
   }
 }
 
@@ -239,7 +252,7 @@ messages.forEach((_, i) => {
     msgBox.innerHTML = "";
     typeText(msgBox, messages[i]);
     unload.style.display = "none";
-    setTimeout(() => next.style.display = "inline-block", 3000);
+    setTimeout(() => next.style.display = "inline-block", 2500);
   });
 
   next.addEventListener("click", () => {
