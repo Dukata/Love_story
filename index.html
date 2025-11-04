@@ -9,21 +9,20 @@
     background-color: #0b0b12;
     color: silver;
     font-family: "Courier New", monospace;
-    text-align: center;
     overflow-x: hidden;
     margin: 0;
-    padding: 0;
+    padding: 40px 0;
+    text-align: center;
   }
 
   h1 {
-    margin-top: 60px;
     font-size: 28px;
     letter-spacing: 2px;
     color: silver;
+    margin-bottom: 10px;
   }
 
   p.subtitle {
-    font-size: 16px;
     color: #c0c0c0;
     margin-bottom: 40px;
   }
@@ -35,20 +34,25 @@
     background: silver;
     border-radius: 50%;
     animation: blink 2s infinite ease-in-out;
+    pointer-events: none;
   }
 
   @keyframes blink {
-    0%, 100% { opacity: 0.2; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.5); }
+    0%,100% {opacity: 0.2; transform: scale(1);}
+    50% {opacity: 1; transform: scale(1.5);}
+  }
+
+  .truck-block {
+    position: relative;
+    margin-bottom: 120px;
   }
 
   .truck {
     position: relative;
     width: 200px;
-    margin: 60px auto 0;
     opacity: 0;
     transform: translateX(100vw);
-    transition: all 2.5s ease;
+    transition: all 2s ease;
   }
 
   .truck.active {
@@ -56,48 +60,98 @@
     transform: translateX(0);
   }
 
-  #unload {
+  .unload-btn {
     background: none;
     border: 1px solid silver;
     color: silver;
-    padding: 10px 30px;
-    margin-top: 25px;
+    padding: 8px 20px;
+    margin-top: 10px;
     cursor: pointer;
     font-family: "Courier New", monospace;
-    font-size: 15px;
   }
 
-  #unload:hover {
+  .unload-btn:hover {
     background: silver;
     color: #0b0b12;
   }
 
-  #message {
-    margin: 40px auto;
-    width: 85%;
+  .message {
+    display: inline-block;
+    background: none;
+    border: 1px solid silver;
+    color: silver;
+    padding: 18px;
+    border-radius: 10px;
+    width: 80%;
     max-width: 500px;
     font-size: 18px;
     line-height: 1.6;
-    border: 1px solid silver;
-    padding: 20px;
-    border-radius: 10px;
-    display: none;
+    margin-top: 15px;
+    opacity: 0;
+    transform: translateX(0);
   }
 
-  #next {
+  .message.show {
+    animation: popOut 1s ease forwards;
+  }
+
+  @keyframes popOut {
+    0% {transform: translateX(0) scale(0.5); opacity: 0;}
+    60% {transform: translateX(40px) scale(1.1); opacity: 1;}
+    100% {transform: translateX(50px) scale(1); opacity: 1;}
+  }
+
+  .next-btn {
+    display: none;
+    margin-top: 20px;
     background: none;
     border: 1px solid silver;
     color: silver;
-    padding: 10px 25px;
-    margin-top: 20px;
+    padding: 8px 18px;
     cursor: pointer;
-    display: none;
-    font-family: "Courier New", monospace;
   }
 
-  #next:hover {
+  .next-btn:hover {
     background: silver;
     color: #0b0b12;
+  }
+
+  #final {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(11,11,18,0.95);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  #final img {
+    width: 300px;
+    transform: translateX(100vw);
+    transition: all 2s ease;
+  }
+
+  #final img.active {
+    transform: translateX(0);
+  }
+
+  #final h2 {
+    color: silver;
+    margin-top: 20px;
+    font-size: 24px;
+    line-height: 1.5;
+  }
+
+  #close {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 24px;
+    color: silver;
+    cursor: pointer;
   }
 </style>
 </head>
@@ -106,13 +160,13 @@
 <h1>Naše putovanje</h1>
 <p class="subtitle">Svaka tura donosi novu uspomenu...</p>
 
-<img src="IMG_8981.png" class="truck" id="truck" alt="Kamion">
+<div id="journey"></div>
 
-<button id="unload">Istovar</button>
-
-<div id="message"></div>
-
-<button id="next">Nova tura ▶</button>
+<div id="final">
+  <div id="close">✖</div>
+  <img src="IMG_8981.png" id="bigTruck" alt="Veliki kamion">
+  <h2>Volim te 365 puta do sunca i meseca i nazad 💙💙💙</h2>
+</div>
 
 <script>
 const messages = [
@@ -145,15 +199,21 @@ const nextLabels = [
   "Završna tura 💙"
 ];
 
-let current = 0;
-const truck = document.getElementById("truck");
-const unloadBtn = document.getElementById("unload");
-const msgBox = document.getElementById("message");
-const nextBtn = document.getElementById("next");
+const journey = document.getElementById("journey");
 
-window.onload = () => {
-  truck.classList.add("active");
-};
+messages.forEach((msg, i) => {
+  const block = document.createElement("div");
+  block.className = "truck-block";
+  block.innerHTML = `
+    <img src="IMG_8981.png" class="truck" id="truck${i}">
+    <br>
+    <button class="unload-btn" id="btn${i}">Istovar</button>
+    <div class="message" id="msg${i}">${msg}</div>
+    <br>
+    <button class="next-btn" id="next${i}">${nextLabels[i]}</button>
+  `;
+  journey.appendChild(block);
+});
 
 function typeText(element, text, i = 0) {
   if (i < text.length) {
@@ -162,41 +222,51 @@ function typeText(element, text, i = 0) {
   }
 }
 
-unloadBtn.onclick = () => {
-  msgBox.style.display = "block";
-  msgBox.innerHTML = "";
-  typeText(msgBox, messages[current]);
-  unloadBtn.style.display = "none";
-  setTimeout(() => {
-    nextBtn.innerText = nextLabels[current];
-    nextBtn.style.display = "inline-block";
-  }, 3000);
+function activateTruck(i) {
+  const truck = document.getElementById(`truck${i}`);
+  setTimeout(() => truck.classList.add("active"), 200);
+}
+
+activateTruck(0);
+
+messages.forEach((_, i) => {
+  const unload = document.getElementById(`btn${i}`);
+  const msgBox = document.getElementById(`msg${i}`);
+  const next = document.getElementById(`next${i}`);
+
+  unload.addEventListener("click", () => {
+    msgBox.classList.add("show");
+    msgBox.innerHTML = "";
+    typeText(msgBox, messages[i]);
+    unload.style.display = "none";
+    setTimeout(() => next.style.display = "inline-block", 3000);
+  });
+
+  next.addEventListener("click", () => {
+    next.style.display = "none";
+    if (i + 1 < messages.length) activateTruck(i + 1);
+    else showFinal();
+  });
+});
+
+function showFinal() {
+  const final = document.getElementById("final");
+  const bigTruck = document.getElementById("bigTruck");
+  final.style.display = "flex";
+  setTimeout(() => bigTruck.classList.add("active"), 100);
+}
+
+document.getElementById("close").onclick = () => {
+  document.getElementById("final").style.display = "none";
 };
 
-nextBtn.onclick = () => {
-  current++;
-  if (current < messages.length) {
-    msgBox.style.display = "none";
-    nextBtn.style.display = "none";
-    unloadBtn.style.display = "inline-block";
-    truck.classList.remove("active");
-    setTimeout(() => truck.classList.add("active"), 100);
-  } else {
-    document.body.innerHTML = `
-      <h1 style="color:silver; font-size:28px; margin-top:60px;">Volim te 365 puta do sunca i meseca i nazad 💙💙💙</h1>
-      <p style="color:#ccc;">(Klikni da se vratiš na početak)</p>
-    `;
-    document.body.onclick = () => location.reload();
-  }
-};
-
-// sitne zvezdice po ekranu
-for(let i=0; i<50; i++){
-  const s = document.createElement('div');
-  s.className = 'stars';
-  s.style.top = Math.random()*100 + '%';
-  s.style.left = Math.random()*100 + '%';
-  s.style.animationDuration = (1 + Math.random()*2) + 's';
+// zvezdice
+for(let i=0;i<70;i++){
+  const s=document.createElement('div');
+  s.className='stars';
+  s.style.top=Math.random()*100+'%';
+  s.style.left=Math.random()*100+'%';
+  s.style.animationDuration=(1+Math.random()*2)+'s';
   document.body.appendChild(s);
 }
 </script>
