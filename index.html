@@ -6,229 +6,200 @@
 <title>Naše putovanje</title>
 <style>
   body {
-    margin: 0;
-    background-color: #001122;
-    overflow: hidden;
+    background-color: #0b0b12;
     color: silver;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: "Courier New", monospace;
     text-align: center;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
   }
+
   h1 {
+    margin-top: 60px;
     font-size: 28px;
-    margin-top: 40px;
+    letter-spacing: 2px;
     color: silver;
   }
+
   p.subtitle {
-    color: #c0c0c0;
     font-size: 16px;
-    margin-top: -10px;
+    color: #c0c0c0;
     margin-bottom: 40px;
   }
+
   .stars {
     position: fixed;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .star {
-    position: absolute;
     width: 2px;
     height: 2px;
     background: silver;
     border-radius: 50%;
-    animation: twinkle 3s infinite ease-in-out;
-    opacity: 0.6;
+    animation: blink 2s infinite ease-in-out;
   }
-  @keyframes twinkle {
-    0%,100% {opacity: 0.2; transform: scale(0.8);}
-    50% {opacity: 1; transform: scale(1.5);}
+
+  @keyframes blink {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
   }
 
   .truck {
-    width: 200px;
     position: relative;
-    right: -300px;
-    transition: right 2.5s ease-in-out;
-    z-index: 2;
-  }
-  .truck.enter {
-    right: calc(50% - 100px);
+    width: 200px;
+    margin: 60px auto 0;
+    opacity: 0;
+    transform: translateX(100vw);
+    transition: all 2.5s ease;
   }
 
-  .button {
-    background-color: transparent;
+  .truck.active {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  #unload {
+    background: none;
     border: 1px solid silver;
     color: silver;
-    padding: 8px 20px;
-    margin-top: 20px;
+    padding: 10px 30px;
+    margin-top: 25px;
     cursor: pointer;
-    border-radius: 8px;
-    font-family: 'IBM Plex Mono', monospace;
-    z-index: 3;
-  }
-  .button:hover {
-    background-color: rgba(255,255,255,0.1);
+    font-family: "Courier New", monospace;
+    font-size: 15px;
   }
 
-  .message {
-    max-width: 600px;
-    margin: 30px auto;
+  #unload:hover {
+    background: silver;
+    color: #0b0b12;
+  }
+
+  #message {
+    margin: 40px auto;
+    width: 85%;
+    max-width: 500px;
     font-size: 18px;
     line-height: 1.6;
-    opacity: 0;
-    transition: opacity 1s;
-  }
-  .visible {
-    opacity: 1;
+    border: 1px solid silver;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
   }
 
-  #finalMessage {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    line-height: 1.6;
+  #next {
+    background: none;
+    border: 1px solid silver;
     color: silver;
-    text-shadow: 0 0 10px silver;
-  }
-  #close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    color: silver;
-    font-size: 22px;
+    padding: 10px 25px;
+    margin-top: 20px;
     cursor: pointer;
     display: none;
+    font-family: "Courier New", monospace;
+  }
+
+  #next:hover {
+    background: silver;
+    color: #0b0b12;
   }
 </style>
 </head>
 <body>
 
-<div class="stars" id="stars"></div>
-
 <h1>Naše putovanje</h1>
-<p class="subtitle">Svaka uspomena dolazi svojim kamionom...</p>
+<p class="subtitle">Svaka tura donosi novu uspomenu...</p>
 
-<img src="IMG_8981.png" class="truck" id="truck">
-<br>
-<button id="unload" class="button" onclick="unload()">Istovar</button>
+<img src="IMG_8981.png" class="truck" id="truck" alt="Kamion">
 
-<div class="message" id="message"></div>
-<button id="nextBtn" class="button" style="display:none;" onclick="nextTruck()"></button>
+<button id="unload">Istovar</button>
 
-<div id="finalMessage">
-  Volim te 365 puta do sunca i meseca i nazad 💙💙💙💙
-</div>
-<div id="close" onclick="restart()">✖</div>
+<div id="message"></div>
+
+<button id="next">Nova tura ▶</button>
 
 <script>
 const messages = [
   "Kada si mi čestitao rođendan, znala sam da je to to i da tu počinje naša priča. ♾️",
   "Osmeh koji me je kupio, duhovitost koju retko ko danas ima. 😁",
-  "Naša prva vožnja. Sećam se, napolju je bilo ledeno. Dvoumili smo se da li šetnja ili vožnja i odlučili smo se za vožnju. Seti se samo koliko si pričao tada. 😂",
-  "Ah, taj dm i roda. Da nije bilo njih, ne znam u šta bih gledala. Možda bih ti olakšala taj prvi poljubac. 💋",
-  "Sećaš se da si mi stalno slikao jastuk pored sebe koji nije imao jastučnicu i govorio da moraš da staviš tu jastučnicu za nekoga. 💕",
+  "Naša prva vožnja. Sećam se, napolju je bilo ledeno. Dvoumili smo se da li šetnja ili vožnja i odlučili smo se za vožnju. 😂",
+  "Ah, taj dm i roda. Da nije bilo njih, ne znam u šta bih gledala. 💋",
+  "Sećaš se da si mi stalno slikao jastuk pored sebe koji nije imao jastučnicu i govorio da moraš da stavis tu jastučnicu za nekoga. 💕",
   "Naglo je krenulo upoznavanje roditelja i sve se zbrzalo, ali nekako sam znala i osećala da sve to tako treba da bude. 🥳",
   "Prvo “volim te” je izašlo naravno iz tvojih usana. 😁",
   "Kada si me pitao da li želim da živim kod tebe, unutrašnji glas je vrištao “DAAAAA” ali sam staloženo odgovorila “pa, videćemo”. 🤩",
   "Imam u tebe ogromno poverenje, sigurnost koju mi niko do sada nije pružio i snagu koju mi svakim danom sve više daješ. 🫶🏻",
   "Doneli smo važnu odluku u našim životima što se tiče tvog posla i naravno što se nas tiče…👫",
-  "Jako sam srećna što polako pravimo nešto svoje — mic po mic i eto nama uskoro sređene sobe. 🏘️",
+  "Jako sam srećna što polako pravimo nešto svoje - mic po mic i eto nama uskoro sređene sobe. 🏘️",
   "Iskreno se nadam da ću moći svake godine da nastavljam ovu priču i da je dopunjujem mnogim uspomenama. 🔜🔜"
 ];
+
 const nextLabels = [
-  "Nova tura 🚛", "Još jedna vožnja 🚚", "Sledeća ruta 🛣️", "Nova isporuka 📦",
-  "Još jedan tovar 💌", "Sledeća tura 🚛", "Nova vožnja 🛞", "Još jedan kamion 🚚",
-  "Nova dostava 💫", "Sledeća linija 🛤️", "Još jedna uspomena 🩵", "Kraj puta 💙"
+  "Još jedna vožnja ▶",
+  "Nova ruta ▶",
+  "Dalje putovanje ▶",
+  "Nova tura ▶",
+  "Još malo goriva ▶",
+  "Nova destinacija ▶",
+  "Pun gas ▶",
+  "Sledeća tura ▶",
+  "Još jedan tovar uspomena ▶",
+  "Na putu dalje ▶",
+  "Predzadnja vožnja ▶",
+  "Završna tura 💙"
 ];
 
-let index = 0;
-const truck = document.getElementById('truck');
-const msg = document.getElementById('message');
-const nextBtn = document.getElementById('nextBtn');
-const unloadBtn = document.getElementById('unload');
-const finalMsg = document.getElementById('finalMessage');
-const closeBtn = document.getElementById('close');
+let current = 0;
+const truck = document.getElementById("truck");
+const unloadBtn = document.getElementById("unload");
+const msgBox = document.getElementById("message");
+const nextBtn = document.getElementById("next");
 
-function makeStars(){
-  const sky = document.getElementById('stars');
-  for(let i=0;i<80;i++){
-    const s=document.createElement('div');
-    s.className='star';
-    s.style.left=Math.random()*100+'vw';
-    s.style.top=Math.random()*100+'vh';
-    s.style.animationDuration=(2+Math.random()*4)+'s';
-    sky.appendChild(s);
+window.onload = () => {
+  truck.classList.add("active");
+};
+
+function typeText(element, text, i = 0) {
+  if (i < text.length) {
+    element.innerHTML += text.charAt(i);
+    setTimeout(() => typeText(element, text, i + 1), 35);
   }
 }
-makeStars();
 
-function unload(){
-  unloadBtn.style.display='none';
-  msg.textContent='';
-  typeWriter(messages[index], 25, ()=>{
-    msg.classList.add('visible');
-    nextBtn.style.display='inline-block';
-    nextBtn.textContent=nextLabels[index];
-  });
-}
-function typeWriter(text, speed, callback){
-  let i=0;
-  function step(){
-    if(i<text.length){
-      msg.textContent+=text.charAt(i);
-      i++;
-      setTimeout(step,speed);
-    } else if(callback){callback();}
-  }
-  step();
-}
+unloadBtn.onclick = () => {
+  msgBox.style.display = "block";
+  msgBox.innerHTML = "";
+  typeText(msgBox, messages[current]);
+  unloadBtn.style.display = "none";
+  setTimeout(() => {
+    nextBtn.innerText = nextLabels[current];
+    nextBtn.style.display = "inline-block";
+  }, 3000);
+};
 
-function nextTruck(){
-  msg.classList.remove('visible');
-  nextBtn.style.display='none';
-  msg.textContent='';
-  index++;
-  if(index<messages.length){
-    truck.classList.remove('enter');
-    setTimeout(()=>{truck.classList.add('enter');unloadBtn.style.display='inline-block';},500);
+nextBtn.onclick = () => {
+  current++;
+  if (current < messages.length) {
+    msgBox.style.display = "none";
+    nextBtn.style.display = "none";
+    unloadBtn.style.display = "inline-block";
+    truck.classList.remove("active");
+    setTimeout(() => truck.classList.add("active"), 100);
   } else {
-    endScene();
+    document.body.innerHTML = `
+      <h1 style="color:silver; font-size:28px; margin-top:60px;">Volim te 365 puta do sunca i meseca i nazad 💙💙💙</h1>
+      <p style="color:#ccc;">(Klikni da se vratiš na početak)</p>
+    `;
+    document.body.onclick = () => location.reload();
   }
-}
+};
 
-function endScene(){
-  document.body.innerHTML='';
-  document.body.style.background='#001122';
-  const stars=document.createElement('div');
-  stars.className='stars';
-  document.body.appendChild(stars);
-  makeStars();
-  const bigTruck=document.createElement('img');
-  bigTruck.src='IMG_8981.png';
-  bigTruck.style.width='300px';
-  bigTruck.style.position='absolute';
-  bigTruck.style.top='50%';
-  bigTruck.style.left='100%';
-  bigTruck.style.transform='translateY(-50%)';
-  bigTruck.style.transition='left 5s linear';
-  document.body.appendChild(bigTruck);
-  const text=document.createElement('div');
-  text.innerHTML='Volim te 365 puta do sunca i meseca i nazad 💙💙💙💙';
-  text.style.position='absolute';
-  text.style.top='60%';
-  text.style.left='100%';
-  text.style.transform='translateY(-50%)';
-  text.style.color='silver';
-  text.style.fontSize='22px';
-  text.style.whiteSpace='nowrap';
-  text.style.transition='left 5s linear';
-  document.body.appendChild(text);
-  setTimeout(()=>{bigTruck.style.left='-350px';text.style.left='10%';},200);
+// sitne zvezdice po ekranu
+for(let i=0; i<50; i++){
+  const s = document.createElement('div');
+  s.className = 'stars';
+  s.style.top = Math.random()*100 + '%';
+  s.style.left = Math.random()*100 + '%';
+  s.style.animationDuration = (1 + Math.random()*2) + 's';
+  document.body.appendChild(s);
 }
-window.onload=()=>truck.classList.add('enter');
 </script>
+
 </body>
 </html>
